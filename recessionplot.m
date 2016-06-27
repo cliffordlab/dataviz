@@ -1,14 +1,16 @@
-function h=ShadePlotForEmpahsis( x,colors,alphas)
-% ShadePlotForEmpahsis
+function h = recessionplot(x, colors, alphas)
+
+% h = recessionplot( x,colors,alphas)
 % Plots a shaded bar for emphasis as commonly seen on cconomic charts
 %
 % INPUTS:
 %  x     where the bar is placed.   If you want a bar from x=4:8 then
 %        use [4 8].  If you want x=[4:8,10:20] then use {4:8,10:20}
+%
 % colors Use 'y' to make all bars yellow.  Use {'y','g','r'} for
 %        yellow, green and red bars.
-% alphas Use 0.5 if you want all bars to be translucent.  Use {0,.5,1}
-%        for transparent, translucet and opaque bars.
+%
+% alpha -  ranges from 0.0 - 1.0, translucent to opaque
 %
 % USAGE:
 % % DEFINE DATA
@@ -36,44 +38,33 @@ function h=ShadePlotForEmpahsis( x,colors,alphas)
 % title({'ShadePlotForEmphasis','(P<80 yellow, P<68 green)'});
 %
 % % DRAW SOME YELLOW BARS
-% ShadePlotForEmpahsis(Y,'y',0.5);
+% recessionplot(Y,'y',0.5);
 %
 % % DRAW A GREEN BAR
-% ShadePlotForEmpahsis(G,'g',0.5);
-%
-%
-% | ##  _#__/
-% | ##  / #
-% | ## / #
-% | /#\_/  #
-% |/ ##   #
-% |__##_____#_____
-%
-% IT'S NOT FANCY BUT IT WORKS
-
-% Michael Robbins
-% robbins@bloomberg.net
-% michael.robbins@us.cibc.com
+% recessionplot(G,'g',0.5);
 
 if nargin<1
-   x={[today-50 today-30],[today-20 today-10]};
+  x={[today-50 today-30],[today-20 today-10]};
 end;
+
 if nargin<2 colors='y'; end;
 if nargin<2 alphas=.5; end;
 
-if ~iscell( x)  x={ x}; end;
-if ~iscell(colors) colors={colors}; end;
+if ~iscell(x) x = {x}; end;
+if ~iscell(colors) colors = {colors}; end;
 if ~iscell(alphas) alphas={alphas}; end;
 
-if length(colors)>length( x) colors=colors(1:length( x)); end;
-if length(colors)<length( x) t=colors{1}; colors=[]; for i=1:length( x) colors{i}=t; end; end;
+if length(colors) > length(x) colors=colors(1:length(x)); end;
+if length(colors) < length(x) t = colors{1}; colors=[]; for i = 1:length(x) colors{i} = t; end; end;
 
-if length(alphas)>length( x) alphas=alphas(1:length( x)); end;
-if length(alphas)<length( x) t=alphas{1}; alphas=[]; for i=1:length( x) alphas{i}=t; end; end;
+if length(alphas) > length(x) alphas=alphas(1:length(x)); end;
+if length(alphas) < length(x) t = alphas{1}; alphas = []; for i = 1:length(x) alphas{i} = t; end; end;
 
-for i=1:length( x)
-  h(i)=patch([repmat( x{i}(1),1,2) repmat( x{i}(2),1,2)], ...
-    [get(gca,'YLim') fliplr(get(gca,'YLim'))], ...
-    [0 0 0 0],colors{i});
+for i=1:length(x)
+    h(i) = patch([repmat(x{i}(1),1,2) repmat(x{i}(2),1,2)], ...
+                 [get(gca,'YLim') fliplr(get(gca,'YLim'))], ...
+                 colors{i});
+%                  [0 0 0 0], colors{i});
     set(h(i),'FaceAlpha',alphas{i});
+    set(h,'EdgeColor','None');
 end;

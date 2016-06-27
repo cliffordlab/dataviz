@@ -999,13 +999,17 @@ else % plot them all on one graph with the stairs function
             else % plot it smooth
                 
                 xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
-%                 not to (end-1) like above, so we got an extra digit
+                
+                % not to (end-1) like above, so we got an extra digit
                 yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
-%                 xi = [linspace(SXRange(1),SXRange(2),500)]; yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
+                
+                % xi = [linspace(SXRange(1),SXRange(2),500)]; yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
                 plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth);
+                
                 if vertLinesFlag % plot those points, otherwise its a wash.
                     plot(logFunc(x{k}(1:end-1)+binWidth(k)/2),n{k}(1:end-1),'.','color',lineStyleOrder{k},'markersize',15);
                 end
+                
             end
         end
     end
@@ -2067,12 +2071,12 @@ for ii=1:length(hReg)
     set(get(get(hReg(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
 end
 
-% remove all remenants of legends
-if forceNoLegend
-    for ii=1:length(hReg2)
-        set(get(get(hReg2(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
-    end
-end
+% % remove all remenants of legends
+% if forceNoLegend
+%     for ii=1:length(hReg2)
+%         set(get(get(hReg2(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
+%     end
+% end
 %% set the axis
 % The axis is only messed with if you didn't pass a position value (because
 % I figured you just wanted to make a quick plot without worry about much
