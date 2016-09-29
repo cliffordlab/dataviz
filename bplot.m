@@ -1,4 +1,5 @@
 % function forLegend = bplot(X,varargin)
+
 % This function will create a nice boxplot from a set of data. You don't
 % need any toolboxes.
 % 
