@@ -1,7 +1,9 @@
-%% description
-% function  [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
+function [theText, rawN, x] = nhist(cellValues, varargin)
+
+%	function  [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
 % 
-% NHIST(x); works just like hist(x) but the resulting plot looks nice.
+%   OVERVIEW
+%       Creates beautiful histograms.
 % 
 % t = NHIST(Y) bins the elements of Y into equally spaced containers
 %            and returns a string with information about the distributions.
@@ -127,7 +129,7 @@
 %                             'jet','gray','summer','cool', etc.
 %                        For 'separate' plots color will specify the color of the
 %                        bar graphs. You must use the [R G B] standard
-%                        color definitions. 
+%                        color definitions.
 %__________________________________________________________________________
 % General Figure Settings
 %            'separate': Plot each histogram separately, also use normal
@@ -159,7 +161,7 @@
 %  it allows the user to make the bins larger or smaller to their tastes.
 %  Larger binFactor means more bins. 1 is the default
 % 
-%Source: http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
+% Source: http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
 % 
 %% Default function behaviour
 % 
@@ -185,6 +187,7 @@
 % stdTimes=4; The axes will be cutoff at a maximum of 4 times the standard
 % deviation from the mean.
 % Different data sets will be plotted with a different number of bins.
+
 %% Acknowledgments
 % Thank you to the AP-Lab at Boston University for funding me while I
 % developed this function. Thank you to the AP-Lab, Avi and Eli for help
@@ -206,11 +209,11 @@
 % nhist(A,'binfactor',4)
 % nhist(A,'samebins')
 % nhist(A,'median','noerror')
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Jonathan Lansey 2010-2013,                                              %
-%                   questions to Lansey at gmail.com                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [theText,rawN, x] = nhist(cellValues, varargin)
+%
+% Written by Jonathan Lansey <lansey@gmail.com>
+% Modified by Erik Reinertsen <erikrtn@gmail.com>
+
+
 %% INITIALIZE PARAMETERS
 % Default initialization of the parameters,
 
@@ -261,6 +264,7 @@ decimalPlaces=2;
 legendExists=0;
 linewidth=2;
 newfigFlag=0;
+custom_position_flag = 0;
 
 barFactor=1;
 normalHist=0;
@@ -272,6 +276,9 @@ k = 1;
 while k <= length(varargin)
     if ischar(varargin{k})
     switch (lower(varargin{k}))
+        case 'position'
+            custom_position_flag = 1;
+            position_values = varargin{k+1};
         case {'legend','titles','title'}
             cellLegend=varargin{k+1};
             legendExists=1;
@@ -327,7 +334,6 @@ while k <= length(varargin)
         case {'log'}
             logFlag = 1;
             logFunc = @(x) 10.^x;
-
             
         case {'int','integer','discrete','intbins','intbin'}
             intbinsForcedFlag = 1;
@@ -352,14 +358,14 @@ while k <= length(varargin)
             k = k + 1;
         case {'color','colors'}
             lineColor=varargin{k+1};
-            if ischar(lineColor)
-                %             if strcmp(lineColor,'multicolor')
+            if ~isempty(lineColor)
                 multicolorFlag = 1;
-                %             end 
-            else %then lineColor will be redone later
                 faceColor = lineColor;
+                k = k + 1;
+            else
+                warning('user entered parameter is not recognized')
+                disp('unrecognized term is:'); disp(varargin{k});
             end
-            k = k + 1;
         case {'npoints','points'}
             npointsFlag=1;
         case {'lines','line'}
@@ -531,7 +537,12 @@ for k=1:num2Plot
     if nnan>0
         cellValues{k}=cellValues{k}(~nanValues);
         
-        if nnan>1, waswere='were'; else waswere='was';end
+        if nnan>1
+            waswere = 'were';
+        else
+            waswere ='was';
+        end
+        
         warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
     end
 
@@ -876,22 +887,32 @@ end
 
 %% CREATE THE FIGURE
 if newfigFlag % determine figure height
-    scrsz = get(0,'ScreenSize');
-    sizes=[650 850 1000 scrsz(4)-8];
-    if num2Plot>=5
-        figHeight=sizes(4);
-    elseif num2Plot>2
-        figHeight=sizes(num2Plot-2);
+    
+    % If user specifies custom position coordinates
+    if custom_position_flag
+        figure('Position', position_values);
+        
+    % If not, set default position values
+    else
+        scrsz = get(0,'ScreenSize');
+        sizes = [650 850 1000 scrsz(4)-8];
+
+        if num2Plot>=5
+            figHeight=sizes(4);
+        elseif num2Plot>2
+            figHeight=sizes(num2Plot-2);
+        end
+
+        if normalHist && num2Plot>2
+            figure('Position',[4 4 435 figHeight]);
+        else % no reason to stretch it out so much, use default size
+            figure;
+        end
     end
-    if normalHist && num2Plot>2
-%         figure('Name', Title,'Position',[4     300     335    figHeight%         ]);
-        figure('Position',[4    4     435    figHeight   ]);
-    else % no reason to stretch it out so much, use default size
-        figure;
-    end
-%     figure('Name', Title);
+    
     Hx = axes('Box', 'off', 'FontSize', AxisFontSize);
     title(makeTitle(Title));
+
 else % all we need to do is make sure that the old figures holdstate is okay.
     %save the initial hold state of the figure.
     hold_state = ishold;
@@ -909,6 +930,7 @@ else % all we need to do is make sure that the old figures holdstate is okay.
 end
 
 hold on;
+
 %% PREPARE THE COLORS
 if normalHist %
    if multicolorFlag
@@ -925,9 +947,13 @@ if normalHist %
         end
    end
 else % they will all be in one plot, its simple. there is no faceStyleOrder
-    if ischar(lineColor) % then the user must have inputted it! 
-%       That means we should use the colormap they gave
-        lineStyleOrder=linspecer(num2Plot,lineColor);
+    
+    % If user input custom colors
+    if ~isempty(lineColor) 
+        lineStyleOrder = lineColor;
+% This original code seems wrong...
+%     if ischar(lineColor) % then the user must have inputted it!
+%         lineStyleOrder=linspecer(num2Plot,lineColor);
     else % just use the default 'jet' colormap.
         lineStyleOrder=linspecer(num2Plot,'qualitative');
     end    
