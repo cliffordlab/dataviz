@@ -1,8 +1,9 @@
 function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
+
 % function H=shadedErrorBar(x,y,errBar,lineProps,transparent)
 %
 % Purpose 
-% Makes a 2-d line plot with a pretty shaded error bar made
+% Makes a 2-D line plot with a pretty shaded error bar made
 % using patch. Error bar color is chosen automatically.
 %
 % Inputs
@@ -17,7 +18,7 @@ function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
 %          statistic the line should be and the second defines the
 %          error bar.
 % lineProps - [optional,'-k' by default] defines the properties of
-%             the data line. e.g.:    
+%             the data line. e.g.;
 %             'or-', or {'-or','markerfacecolor',[1,0.2,0.2]}
 % transparent - [optional, 0 by default] if ==1 the shaded error
 %               bar is made transparent, which forces the renderer
@@ -33,7 +34,7 @@ function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
 % y=randn(30,80); x=1:size(y,2);
 % shadedErrorBar(x,mean(y,1),std(y),'g');
 % shadedErrorBar(x,y,{@median,@std},{'r-o','markerfacecolor','r'});    
-% shadedErrorBar([],y,{@median,@std},{'r-o','markerfacecolor','r'});    
+% shadedErrorBar([],y,{@median,@std},{'r-o','markerfacecolor','r'});
 %
 % Overlay two transparent lines
 % y=randn(30,80)*10; x=(1:size(y,2))-40;
@@ -50,7 +51,7 @@ function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % Error checking    
-error(nargchk(3,5,nargin))
+narginchk(3,5);
 
 
 %Process y using function handles if needed to make the error bar
@@ -140,11 +141,9 @@ xP=[x,fliplr(x)];
 xP(isnan(yP))=[];
 yP(isnan(yP))=[];
 
-
 H.patch=patch(xP,yP,1,'facecolor',patchColor,...
               'edgecolor','none',...
               'facealpha',faceAlpha);
-
 
 %Make pretty edges around the patch. 
 H.edge(1)=plot(x,lE,'-','color',edgeColor);
@@ -153,7 +152,6 @@ H.edge(2)=plot(x,uE,'-','color',edgeColor);
 %Now replace the line (this avoids having to bugger about with z coordinates)
 delete(H.mainLine)
 H.mainLine=plot(x,y,lineProps{:});
-
 
 if ~holdStatus, hold off, end
 
