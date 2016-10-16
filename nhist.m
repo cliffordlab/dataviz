@@ -187,11 +187,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % stdTimes=4; The axes will be cutoff at a maximum of 4 times the standard
 % deviation from the mean.
 % Different data sets will be plotted with a different number of bins.
-
-%% Acknowledgments
-% Thank you to the AP-Lab at Boston University for funding me while I
-% developed this function. Thank you to the AP-Lab, Avi and Eli for help
-% with designing and testing it and the Mathworks community for comments!
+%
 %% Examples
 % Cell array example:
 % A={randn(1,10^5),randn(10^3,1)+1};
@@ -214,8 +210,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % Modified by Erik Reinertsen <erikrtn@gmail.com>
 
 
-%% INITIALIZE PARAMETERS
-% Default initialization of the parameters,
+%% Initialize parameters
 
 stdTimes=4; % the number of times the standard deviation to set the upper end of the axis to be.
 binFactor=1.5;
@@ -230,30 +225,23 @@ intbinsFlag = 0;
 % These are used later to set the output parameters right.
 structFlag=0;
 arrayFlag=0;
-
 minX=[]; % for the axis in case users don't enter anything
 maxX=[];
 minBins=10;
 maxBins=150;
 SXLabel = '';
 yLabelFlag=0;
-
 EPSFileName = '';
 Title = '';
 AxisFontSize = 12;
 npointsFlag=0;
-
 legendLocation='best';
 forceNoLegend=0;
-% lineColor = [.49 .49 .49];
 lineColor = [0 0 0];
 faceColor = [.7 .7 .7];
-
 vertLinesForcedFlag=0;
-
 multicolorFlag=0;
 brightnessExponent=1/2;
-
 plotStdFlag = 1; % 1 if either serror or std will be plotted
 serrorFlag = 0;
 medianFlag = 0;
@@ -265,7 +253,7 @@ legendExists=0;
 linewidth=2;
 newfigFlag=0;
 custom_position_flag = 0;
-
+visible_flag = 'on';
 barFactor=1;
 normalHist=0;
 logFlag = 0;
@@ -276,6 +264,9 @@ k = 1;
 while k <= length(varargin)
     if ischar(varargin{k})
     switch (lower(varargin{k}))
+        case {'visible', 'Visible'}
+            visible_flag = varargin{k+1};
+            k = k + 1;
         case 'position'
             custom_position_flag = 1;
             position_values = varargin{k+1};
@@ -357,7 +348,7 @@ while k <= length(varargin)
             linewidth = varargin{k + 1};
             k = k + 1;
         case {'color','colors'}
-            lineColor=varargin{k+1};
+            lineColor = varargin{k+1};
             if ~isempty(lineColor)
                 multicolorFlag = 1;
                 faceColor = lineColor;
@@ -470,7 +461,7 @@ end
 
 
 
-%% Collect the Data, check some things
+%% Collect data, check some things
 num2Plot=length(cellValues);
 
 if legendExists
@@ -484,7 +475,7 @@ if legendExists
     end
 end
 
-% check for negative and zero values if logFlag is used.
+% Check for negative and zero values if logFlag is used.
 if logFlag
     for k=1:num2Plot
         badVals = sum(cellValues{k}<=0);
@@ -494,7 +485,7 @@ if logFlag
     end
 end
 
-% check for integer, or near integer values (to make integer bins without gaps)
+% Check for integer, or near integer values (to make integer bins without gaps)
 
 if intbinsFlag
     intbins=ones(1,num2Plot);
@@ -543,7 +534,7 @@ for k=1:num2Plot
             waswere ='was';
         end
         
-        warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
+%         warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
     end
 
 % Check for and deal with infinite values.
@@ -890,7 +881,7 @@ if newfigFlag % determine figure height
     
     % If user specifies custom position coordinates
     if custom_position_flag
-        figure('Position', position_values);
+        figure('Position', position_values, 'Visible', visible_flag);
         
     % If not, set default position values
     else
@@ -904,7 +895,7 @@ if newfigFlag % determine figure height
         end
 
         if normalHist && num2Plot>2
-            figure('Position',[4 4 435 figHeight]);
+            figure('Position',[4 4 435 figHeight], 'Visible', visible_flag);
         else % no reason to stretch it out so much, use default size
             figure;
         end
@@ -935,7 +926,8 @@ hold on;
 if normalHist %
    if multicolorFlag
 %         lineStyleOrder=linspecer(num2Plot,'jet');
-        faceStyleOrder=linspecer(num2Plot,lineColor);
+%         faceStyleOrder = linspecer(num2Plot, lineColor);
+        faceStyleOrder = lineColor;
         for k=1:num2Plot % make the face colors brighter a bit
             lineStyleOrder{k}=[0 0 0];
             faceStyleOrder{k}=(faceStyleOrder{k}).^(brightnessExponent); % this will make it brighter than the line           
@@ -1639,7 +1631,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Written Jonathan Lansey March 2009, updated 2013 – Lansey at gmail.com %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+
 
 function lineStyles=linspecer(N,varargin)
 
