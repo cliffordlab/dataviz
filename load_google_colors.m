@@ -1,4 +1,4 @@
-function google_colors = load_colors()
+function google_colors = load_google_colors()
 
 % Google Material Design colors
 % (much nicer than Matlab default colors!)
@@ -7,7 +7,7 @@ function google_colors = load_colors()
 %
 % Uses hex2rgb.m
 %
-% By Erik Reinertsen <erikrtn@gmail.com>
+% By Erik Reinertsen <er@gatech.edu>
 
 google_colors.blue = hex2rgb('2196F3');
 
