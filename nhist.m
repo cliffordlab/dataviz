@@ -1,6 +1,6 @@
 function [theText, rawN, x] = nhist(cellValues, varargin)
 
-%	function  [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
+%	function [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
 % 
 %   OVERVIEW
 %       Creates beautiful histograms.
@@ -41,8 +41,6 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %  The function is robust to NaN and +-inf data points (with warnings)
 % 
 %% Optional Properties
-% Note: Alternative names to call the properties are listed at the end of each
-% entry. 
 %__________________________________________________________________________ 
 % Histogram and bin settings
 %           'binfactor': Effects the number of bins used. A larger number
@@ -75,7 +73,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % Text related parameters
 %     'titles','legend': A cell array with strings to put in the legend or
 %                        titles. Also used for text output. 'title'
-%           'nolengend': In case you pass a struct, you may force a legend
+%           'nolegend':  In case you pass a struct, you may force a legend
 %                        to disappear. You will have no way to track the
 %                        data.
 %                'text': Outputs all numbers to text, even ones that are
@@ -94,7 +92,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %                        number of elements) and 'proportion' for
 %                        proportion plots. Setting this parameter will
 %                        override the defaults.
-%               'fsize': Font size, default 12. 'fontsize'
+%            'fontsize': Font size, default 12. 'fsize'
 %            'location': Sets the location of the legend,
 %                        example:NorthOutside. 'legendlocation'
 %__________________________________________________________________________
@@ -147,9 +145,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % Disclaimer: this function is specialized to compare data with comparable
 % standard deviations and means, but greatly varying numbers of points.
 % 
-% Scotts Choice used for this function is a theoretically ideal way of
-% choosing the number of bins. Of course the theory is general and so not
-% rigorous, but I feel it does a good job.
+% Scotts Choice is used to determine the number of bins:
 % (bin width) = 3.5*std(data points)/(number of points)^(1/3);
 % 
 % I did not follow it exactly though, restricting smaller bin sizes to be
@@ -159,7 +155,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % The bin width is further adulterated by user parameter 'binFactor'
 % (new bin width) = (old bin width) / (binFactor);
 %  it allows the user to make the bins larger or smaller to their tastes.
-%  Larger binFactor means more bins. 1 is the default
+%  Larger binFactor means more bins. 1.5 is the default
 % 
 % Source: http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
 % 
@@ -190,14 +186,17 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %
 %% Examples
 % Cell array example:
+%
 % A={randn(1,10^5),randn(10^3,1)+1};
 % nhist(A,'legend',{'\mu=0','\mu=1'});
 % nhist(A,'legend',{'\mu=0','\mu=1'},'separate');
 % 
 % A=[randn(1,10^5)+1 randn(1,2*10^5)+5];
 % nhist(A,'mode')
-% 
+%
+%
 % Structure example:
+%
 % A.mu_is_Zero=randn(1,10^5); A.mu_is_Two=randn(10^3,1)+2;
 % nhist(A);
 % nhist(A,'color','summer')
@@ -207,14 +206,14 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % nhist(A,'median','noerror')
 %
 % Written by Jonathan Lansey <lansey@gmail.com>
-% Modified by Erik Reinertsen <erikrtn@gmail.com>
+% Modified by Erik Reinertsen <er@gatech.edu>
 
 
 %% Initialize parameters
 
-stdTimes=4; % the number of times the standard deviation to set the upper end of the axis to be.
-binFactor=1.5;
-sameBinsFlag=0; % if 1 then all bins will be the same size
+stdTimes = 4; % the number of times the standard deviation to set the upper end of the axis to be.
+binFactor = 1.5;
+sameBinsFlag = 0; % if 1 then all bins will be the same size
 proportionFlag=0;
 pdfFlag = 0;
 numberFlag = 0;
@@ -223,8 +222,8 @@ intbinsForcedFlag = 0;
 intbinsFlag = 0;
 
 % These are used later to set the output parameters right.
-structFlag=0;
-arrayFlag=0;
+structFlag = 0;
+arrayFlag = 0;
 minX=[]; % for the axis in case users don't enter anything
 maxX=[];
 minBins=10;
