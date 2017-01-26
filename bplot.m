@@ -77,12 +77,8 @@
 % This function was developed to be part of a larger histogram function
 % which can be found at this location:
 % http://www.mathworks.com/matlabcentral/fileexchange/27388-plot-and-compare-histograms-pretty-by-default
-% 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Jonathan Lansey 2013,                                                   %
-%                   questions to Lansey at gmail.com                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%%
+
+
 function [forLegend, boxEdge, wisEdge] = bplot(x,varargin)
 %% save the initial hold state of the figure.
 hold_state = ishold;
