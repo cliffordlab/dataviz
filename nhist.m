@@ -1,9 +1,7 @@
-function [theText, rawN, x] = nhist(cellValues, varargin)
-
-%	function [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
+%% description
+% function  [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
 % 
-%   OVERVIEW
-%       Creates beautiful histograms.
+% NHIST(x); works just like hist(x) but the resulting plot looks nice.
 % 
 % t = NHIST(Y) bins the elements of Y into equally spaced containers
 %            and returns a string with information about the distributions.
@@ -41,6 +39,8 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %  The function is robust to NaN and +-inf data points (with warnings)
 % 
 %% Optional Properties
+% Note: Alternative names to call the properties are listed at the end of each
+% entry. 
 %__________________________________________________________________________ 
 % Histogram and bin settings
 %           'binfactor': Effects the number of bins used. A larger number
@@ -73,7 +73,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % Text related parameters
 %     'titles','legend': A cell array with strings to put in the legend or
 %                        titles. Also used for text output. 'title'
-%           'nolegend':  In case you pass a struct, you may force a legend
+%           'nolengend': In case you pass a struct, you may force a legend
 %                        to disappear. You will have no way to track the
 %                        data.
 %                'text': Outputs all numbers to text, even ones that are
@@ -92,7 +92,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %                        number of elements) and 'proportion' for
 %                        proportion plots. Setting this parameter will
 %                        override the defaults.
-%            'fontsize': Font size, default 12. 'fsize'
+%               'fsize': Font size, default 12. 'fontsize'
 %            'location': Sets the location of the legend,
 %                        example:NorthOutside. 'legendlocation'
 %__________________________________________________________________________
@@ -127,7 +127,7 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 %                             'jet','gray','summer','cool', etc.
 %                        For 'separate' plots color will specify the color of the
 %                        bar graphs. You must use the [R G B] standard
-%                        color definitions.
+%                        color definitions. 
 %__________________________________________________________________________
 % General Figure Settings
 %            'separate': Plot each histogram separately, also use normal
@@ -145,7 +145,9 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % Disclaimer: this function is specialized to compare data with comparable
 % standard deviations and means, but greatly varying numbers of points.
 % 
-% Scotts Choice is used to determine the number of bins:
+% Scotts Choice used for this function is a theoretically ideal way of
+% choosing the number of bins. Of course the theory is general and so not
+% rigorous, but I feel it does a good job.
 % (bin width) = 3.5*std(data points)/(number of points)^(1/3);
 % 
 % I did not follow it exactly though, restricting smaller bin sizes to be
@@ -155,9 +157,9 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % The bin width is further adulterated by user parameter 'binFactor'
 % (new bin width) = (old bin width) / (binFactor);
 %  it allows the user to make the bins larger or smaller to their tastes.
-%  Larger binFactor means more bins. 1.5 is the default
+%  Larger binFactor means more bins. 1 is the default
 % 
-% Source: http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
+%Source: http://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
 % 
 %% Default function behaviour
 % 
@@ -183,20 +185,20 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % stdTimes=4; The axes will be cutoff at a maximum of 4 times the standard
 % deviation from the mean.
 % Different data sets will be plotted with a different number of bins.
-%
+%% Acknowledgments
+% Thank you to the AP-Lab at Boston University for funding me while I
+% developed this function. Thank you to the AP-Lab, Avi and Eli for help
+% with designing and testing it and the Mathworks community for comments!
 %% Examples
 % Cell array example:
-%
 % A={randn(1,10^5),randn(10^3,1)+1};
 % nhist(A,'legend',{'\mu=0','\mu=1'});
 % nhist(A,'legend',{'\mu=0','\mu=1'},'separate');
 % 
 % A=[randn(1,10^5)+1 randn(1,2*10^5)+5];
 % nhist(A,'mode')
-%
-%
+% 
 % Structure example:
-%
 % A.mu_is_Zero=randn(1,10^5); A.mu_is_Two=randn(10^3,1)+2;
 % nhist(A);
 % nhist(A,'color','summer')
@@ -204,16 +206,17 @@ function [theText, rawN, x] = nhist(cellValues, varargin)
 % nhist(A,'binfactor',4)
 % nhist(A,'samebins')
 % nhist(A,'median','noerror')
-%
-% Written by Jonathan Lansey <lansey@gmail.com>
-% Modified by Erik Reinertsen <er@gatech.edu>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Jonathan Lansey 2010-2013,                                              %
+%                   questions to Lansey at gmail.com                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [theText,rawN, x] = nhist(cellValues, varargin)
+%% INITIALIZE PARAMETERS
+% Default initialization of the parameters,
 
-
-%% Initialize parameters
-
-stdTimes = 4; % the number of times the standard deviation to set the upper end of the axis to be.
-binFactor = 1.5;
-sameBinsFlag = 0; % if 1 then all bins will be the same size
+stdTimes=4; % the number of times the standard deviation to set the upper end of the axis to be.
+binFactor=1.5;
+sameBinsFlag=0; % if 1 then all bins will be the same size
 proportionFlag=0;
 pdfFlag = 0;
 numberFlag = 0;
@@ -222,25 +225,32 @@ intbinsForcedFlag = 0;
 intbinsFlag = 0;
 
 % These are used later to set the output parameters right.
-structFlag = 0;
-arrayFlag = 0;
+structFlag=0;
+arrayFlag=0;
+
 minX=[]; % for the axis in case users don't enter anything
 maxX=[];
 minBins=10;
 maxBins=150;
 SXLabel = '';
 yLabelFlag=0;
+
 EPSFileName = '';
 Title = '';
 AxisFontSize = 12;
 npointsFlag=0;
+
 legendLocation='best';
 forceNoLegend=0;
-lineColor = [0 0 0];
+lineColor = [.49 .49 .49];
+% lineColor = [0 0 0];
 faceColor = [.7 .7 .7];
+
 vertLinesForcedFlag=0;
+
 multicolorFlag=0;
 brightnessExponent=1/2;
+
 plotStdFlag = 1; % 1 if either serror or std will be plotted
 serrorFlag = 0;
 medianFlag = 0;
@@ -251,8 +261,7 @@ decimalPlaces=2;
 legendExists=0;
 linewidth=2;
 newfigFlag=0;
-custom_position_flag = 0;
-visible_flag = 'on';
+
 barFactor=1;
 normalHist=0;
 logFlag = 0;
@@ -263,12 +272,6 @@ k = 1;
 while k <= length(varargin)
     if ischar(varargin{k})
     switch (lower(varargin{k}))
-        case {'visible', 'Visible'}
-            visible_flag = varargin{k+1};
-            k = k + 1;
-        case 'position'
-            custom_position_flag = 1;
-            position_values = varargin{k+1};
         case {'legend','titles','title'}
             cellLegend=varargin{k+1};
             legendExists=1;
@@ -324,6 +327,7 @@ while k <= length(varargin)
         case {'log'}
             logFlag = 1;
             logFunc = @(x) 10.^x;
+
             
         case {'int','integer','discrete','intbins','intbin'}
             intbinsForcedFlag = 1;
@@ -347,15 +351,15 @@ while k <= length(varargin)
             linewidth = varargin{k + 1};
             k = k + 1;
         case {'color','colors'}
-            lineColor = varargin{k+1};
-            if ~isempty(lineColor)
+            lineColor=varargin{k+1};
+            if ischar(lineColor)
+                %             if strcmp(lineColor,'multicolor')
                 multicolorFlag = 1;
+                %             end 
+            else %then lineColor will be redone later
                 faceColor = lineColor;
-                k = k + 1;
-            else
-                warning('user entered parameter is not recognized')
-                disp('unrecognized term is:'); disp(varargin{k});
             end
+            k = k + 1;
         case {'npoints','points'}
             npointsFlag=1;
         case {'lines','line'}
@@ -460,7 +464,7 @@ end
 
 
 
-%% Collect data, check some things
+%% Collect the Data, check some things
 num2Plot=length(cellValues);
 
 if legendExists
@@ -474,7 +478,7 @@ if legendExists
     end
 end
 
-% Check for negative and zero values if logFlag is used.
+% check for negative and zero values if logFlag is used.
 if logFlag
     for k=1:num2Plot
         badVals = sum(cellValues{k}<=0);
@@ -484,7 +488,7 @@ if logFlag
     end
 end
 
-% Check for integer, or near integer values (to make integer bins without gaps)
+% check for integer, or near integer values (to make integer bins without gaps)
 
 if intbinsFlag
     intbins=ones(1,num2Plot);
@@ -527,13 +531,8 @@ for k=1:num2Plot
     if nnan>0
         cellValues{k}=cellValues{k}(~nanValues);
         
-        if nnan>1
-            waswere = 'were';
-        else
-            waswere ='was';
-        end
-        
-%         warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
+        if nnan>1, waswere='were'; else waswere='was';end
+        warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
     end
 
 % Check for and deal with infinite values.
@@ -877,32 +876,22 @@ end
 
 %% CREATE THE FIGURE
 if newfigFlag % determine figure height
-    
-    % If user specifies custom position coordinates
-    if custom_position_flag
-        figure('Position', position_values, 'Visible', visible_flag);
-        
-    % If not, set default position values
-    else
-        scrsz = get(0,'ScreenSize');
-        sizes = [650 850 1000 scrsz(4)-8];
-
-        if num2Plot>=5
-            figHeight=sizes(4);
-        elseif num2Plot>2
-            figHeight=sizes(num2Plot-2);
-        end
-
-        if normalHist && num2Plot>2
-            figure('Position',[4 4 435 figHeight], 'Visible', visible_flag);
-        else % no reason to stretch it out so much, use default size
-            figure;
-        end
+    scrsz = get(0,'ScreenSize');
+    sizes=[650 850 1000 scrsz(4)-8];
+    if num2Plot>=5
+        figHeight=sizes(4);
+    elseif num2Plot>2
+        figHeight=sizes(num2Plot-2);
     end
-    
+    if normalHist && num2Plot>2
+%         figure('Name', Title,'Position',[4     300     335    figHeight%         ]);
+        figure('Position',[4    4     435    figHeight   ]);
+    else % no reason to stretch it out so much, use default size
+        figure;
+    end
+%     figure('Name', Title);
     Hx = axes('Box', 'off', 'FontSize', AxisFontSize);
     title(makeTitle(Title));
-
 else % all we need to do is make sure that the old figures holdstate is okay.
     %save the initial hold state of the figure.
     hold_state = ishold;
@@ -920,13 +909,11 @@ else % all we need to do is make sure that the old figures holdstate is okay.
 end
 
 hold on;
-
 %% PREPARE THE COLORS
 if normalHist %
    if multicolorFlag
 %         lineStyleOrder=linspecer(num2Plot,'jet');
-%         faceStyleOrder = linspecer(num2Plot, lineColor);
-        faceStyleOrder = lineColor;
+        faceStyleOrder=linspecer(num2Plot,lineColor);
         for k=1:num2Plot % make the face colors brighter a bit
             lineStyleOrder{k}=[0 0 0];
             faceStyleOrder{k}=(faceStyleOrder{k}).^(brightnessExponent); % this will make it brighter than the line           
@@ -938,13 +925,9 @@ if normalHist %
         end
    end
 else % they will all be in one plot, its simple. there is no faceStyleOrder
-    
-    % If user input custom colors
-    if ~isempty(lineColor) 
-        lineStyleOrder = lineColor;
-% This original code seems wrong...
-%     if ischar(lineColor) % then the user must have inputted it!
-%         lineStyleOrder=linspecer(num2Plot,lineColor);
+    if ischar(lineColor) % then the user must have inputted it! 
+%       That means we should use the colormap they gave
+        lineStyleOrder=linspecer(num2Plot,lineColor);
     else % just use the default 'jet' colormap.
         lineStyleOrder=linspecer(num2Plot,'qualitative');
     end    
@@ -1016,17 +999,13 @@ else % plot them all on one graph with the stairs function
             else % plot it smooth
                 
                 xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
-                
-                % not to (end-1) like above, so we got an extra digit
+%                 not to (end-1) like above, so we got an extra digit
                 yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
-                
-                % xi = [linspace(SXRange(1),SXRange(2),500)]; yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
+%                 xi = [linspace(SXRange(1),SXRange(2),500)]; yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
                 plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth);
-                
                 if vertLinesFlag % plot those points, otherwise its a wash.
                     plot(logFunc(x{k}(1:end-1)+binWidth(k)/2),n{k}(1:end-1),'.','color',lineStyleOrder{k},'markersize',15);
                 end
-                
             end
         end
     end
@@ -1630,7 +1609,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Written Jonathan Lansey March 2009, updated 2013 – Lansey at gmail.com %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%
 
 function lineStyles=linspecer(N,varargin)
 
@@ -2088,12 +2067,12 @@ for ii=1:length(hReg)
     set(get(get(hReg(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
 end
 
-% % remove all remenants of legends
-% if forceNoLegend
-%     for ii=1:length(hReg2)
-%         set(get(get(hReg2(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
-%     end
-% end
+% remove all remenants of legends
+if forceNoLegend
+    for ii=1:length(hReg2)
+        set(get(get(hReg2(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
+    end
+end
 %% set the axis
 % The axis is only messed with if you didn't pass a position value (because
 % I figured you just wanted to make a quick plot without worry about much
