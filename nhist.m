@@ -1,4 +1,3 @@
-%% description
 % function  [theText, rawN, x] = nhist(cellValues, 'parameter', value, ...)
 % 
 % NHIST(x); works just like hist(x) but the resulting plot looks nice.
@@ -18,7 +17,7 @@
 % NHIST(Y,'Property', . . . )
 % NHIST(Y,'PropertyName',PropertyValue, . . . )
 % See below for the different parameters.
-%__________________________________________________________________________ 
+%
 % Summary of what function does:
 %  1) Automatically sets the number and range of the bins to be appropriate 
 %     for the data.
@@ -206,10 +205,10 @@
 % nhist(A,'binfactor',4)
 % nhist(A,'samebins')
 % nhist(A,'median','noerror')
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Jonathan Lansey 2010-2013,                                              %
-%                   questions to Lansey at gmail.com                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Original code by Jonathan Lansey 2010-2013 <lansey@gmail.com> 
+
+
 function [theText,rawN, x] = nhist(cellValues, varargin)
 %% INITIALIZE PARAMETERS
 % Default initialization of the parameters,
@@ -2067,12 +2066,6 @@ for ii=1:length(hReg)
     set(get(get(hReg(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
 end
 
-% remove all remenants of legends
-if forceNoLegend
-    for ii=1:length(hReg2)
-        set(get(get(hReg2(ii),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); % Exclude line from legend
-    end
-end
 %% set the axis
 % The axis is only messed with if you didn't pass a position value (because
 % I figured you just wanted to make a quick plot without worry about much
