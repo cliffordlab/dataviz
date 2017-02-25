@@ -527,7 +527,7 @@ for k=1:num2Plot
     if nnan>0
         cellValues{k}=cellValues{k}(~nanValues);
         
-        if nnan>1, waswere='were'; else waswere='was';end
+        if nnan>1, waswere='were'; else waswere='was'; end
         warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
     end
 
@@ -1232,8 +1232,10 @@ else % all in one plot:
 %     else
         ylim([0 maxN*(1.1)+modeShift{k}]);
     end
+    
     % set x limits
     xlim(logFunc(axisRange));
+    
     % label y and x axis
     ylabel(SYLabel, 'FontSize', AxisFontSize);
     xlabel(SXLabel, 'FontSize', AxisFontSize);
