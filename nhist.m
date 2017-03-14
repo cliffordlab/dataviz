@@ -1055,7 +1055,7 @@ if modeFlag && medianFlag % just a warning here
     fprintf('The mode is plotted as a dashed line\n');
 end
 
-for k=1:num2Plot  
+for k=1:num2Plot
     if isData(k)
         if normalHist % separate plots with separate y-axis                
             if num2Plot>1
@@ -1412,7 +1412,7 @@ if ~hold_state
 end
 
 
-%% If you are plotting errobars on Matlabs grouped bar plot
+%% If you are plotting errorbars on Matlabs grouped bar plot
 if size(x,1)>1 && size(x,2)>1 % if you need to do a group plot
 % Plot bars
     num2Plot=size(x,2);

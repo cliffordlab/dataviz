@@ -9,8 +9,25 @@ idx_neg = find(labels == 0);
 p_est_pos = labels_est(idx_pos);
 p_est_neg = labels_est(idx_neg);
 
-figure('position', [100 100 680 400]);
+fig = figure('position', [100 100 680 400]);
 
+
+% Because cross-validation results in uneven number of pos
+% and neg outputs, bootstrap random values so we can compare 
+% the two using signed rank test
+for i = 1:100
+    a = p_est_pos;
+    b = p_est_neg;
+    bigger = max(length(a), length(b));
+    smaller = min(length(a), length(b));
+    idx_rand = randperm(bigger, smaller)';
+    if length(a) > length(b)
+        pval(i) = signrank(a(idx_rand), b);
+    else
+        pval(i) = signrank(b(idx_rand), a);
+    end
+end
+    
 % Plot histogram with box plots
 nhist({p_est_pos, p_est_neg}, ...
       'color', {google_colors.red, google_colors.blue},...
@@ -19,7 +36,8 @@ nhist({p_est_pos, p_est_neg}, ...
       'linewidth', 3, ...    
       'legend', legend_entries_cell, 'location', 'best', ...
       'fontsize', 20, ...
-      'ylabel', 'Proportion', 'xlabel', 'P(class)');
+      'ylabel', 'Proportion', ...
+      'xlabel', 'Classifier output: P(PTSD)');
 
 % Remove top tick marks
 set(gca,'box','off');
