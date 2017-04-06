@@ -954,7 +954,7 @@ if normalHist % There will be no legend for the normalHist, therefore this loop 
             subplot(num2Plot,1,k);
         end
         hold on;
-        plot([.5 1.5],[-1 -1],'color',lineStyleOrder{k},'linewidth',linewidth);
+        plot([.5 1.5],[-1 -1],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
         set(gca,'fontsize',AxisFontSize);
     end
 else % do the same thing, but on different subplots
@@ -963,7 +963,7 @@ else % do the same thing, but on different subplots
 %     places with no data have a reserved color spot on a legend.
 %     plot lines below the x axis, they will never show up but will set the
 %     legend appropriately.
-        plot([.5 1.5],[-1 -1],'color',lineStyleOrder{k},'linewidth',linewidth);
+        plot([.5 1.5],[-1 -1],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
     end
     set(gca,'fontsize',AxisFontSize);
 end
@@ -1002,15 +1002,17 @@ else % plot them all on one graph with the stairs function
     for k=1:num2Plot
         if isData(k)
             if ~smoothFlag
-                stairs(logFunc(x{k}),n{k},'color',lineStyleOrder{k},'linewidth',linewidth);
-                plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth);
+                stairs(logFunc(x{k}),n{k},'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
+                plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
             else % plot it smooth
                 
+                % not to (end-1) like above, so we got an extra digit
                 xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
-%                 not to (end-1) like above, so we got an extra digit
                 yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
+                
                 plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
-                if vertLinesFlag % plot those points, otherwise its a wash.
+                
+                if vertLinesFlag % ???
                     plot(logFunc(x{k}(1:end-1)+binWidth(k)/2),n{k}(1:end-1),'.','color',lineStyleOrder{k},'markersize',15);
                 end
             end
