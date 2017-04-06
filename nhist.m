@@ -219,34 +219,29 @@ numberFlag = 0;
 smoothFlag = 0;
 intbinsForcedFlag = 0;
 intbinsFlag = 0;
+use_custom_linestyle = false;
 
 % These are used later to set the output parameters right.
 structFlag=0;
 arrayFlag=0;
-
 minX=[]; % for the axis in case users don't enter anything
 maxX=[];
 minBins=10;
 maxBins=150;
 SXLabel = '';
 yLabelFlag=0;
-
 EPSFileName = '';
 Title = '';
 AxisFontSize = 12;
 npointsFlag=0;
-
 legendLocation='best';
 forceNoLegend=0;
 lineColor = [.49 .49 .49];
 % lineColor = [0 0 0];
 faceColor = [.7 .7 .7];
-
 vertLinesForcedFlag=0;
-
 multicolorFlag=0;
 brightnessExponent=1/2;
-
 plotStdFlag = 1; % 1 if either serror or std will be plotted
 serrorFlag = 0;
 medianFlag = 0;
@@ -309,7 +304,10 @@ while k <= length(varargin)
             if ischar(binFactor)
                 error('binFactor must be a number')
             end
-            
+        case {'Linestyle','linestyle'}
+            use_custom_linestyle = true;
+            linestylevals = varargin{k+1};
+            k = k + 1;
         case {'samebins','samebin','same'}
             sameBinsFlag=1;
         case {'proportion','p','fraction','frac','percent','normal'}
@@ -333,7 +331,7 @@ while k <= length(varargin)
                 temp = varargin{k + 1};
                 if ~ischar(temp) % if its a number then we want to use it.
                     intbinsFlag=temp;
-                    k=k+1;
+                    k = k + 1;
                 end
             end
             
@@ -349,9 +347,7 @@ while k <= length(varargin)
         case {'color','colors'}
             lineColor=varargin{k+1};
             if ischar(lineColor)
-                %             if strcmp(lineColor,'multicolor')
                 multicolorFlag = 1;
-                %             end 
             else %then lineColor will be redone later
                 faceColor = lineColor;
             end
@@ -401,8 +397,8 @@ end
 % intbinsFlag
 
 %% Check if data is an array, not a cell
-valueInfo=whos('cellValues');
-valueType=valueInfo.class;
+valueInfo = whos('cellValues');
+valueType = valueInfo.class;
 
 switch valueType
     case 'cell' %   There are a few cells there, it will run as usual.
@@ -462,6 +458,22 @@ end
 
 %% Collect the Data, check some things
 num2Plot=length(cellValues);
+
+% If number of elements in user's custom input linestyles,
+% initialize default linestyle of '-' 
+if (use_custom_linestyle && length(linestylevals) ~= num2Plot)
+    warning('number of custom line styles does not match number of input data. Reverting to default.');
+    linestylevals = cell(num2Plot,1);
+    linestylevals(:) = {'-'};
+end
+
+% If user does not specify custom line styles,
+% initialize default linestyle of '-' 
+if ~use_custom_linestyle
+    linestylevals = cell(num2Plot,1);
+    linestylevals(:) = {'-'};
+end
+   
 
 if legendExists
     if num2Plot~=length(cellLegend)
@@ -997,8 +1009,7 @@ else % plot them all on one graph with the stairs function
                 xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
 %                 not to (end-1) like above, so we got an extra digit
                 yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
-%                 xi = [linspace(SXRange(1),SXRange(2),500)]; yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
-                plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth);
+                plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
                 if vertLinesFlag % plot those points, otherwise its a wash.
                     plot(logFunc(x{k}(1:end-1)+binWidth(k)/2),n{k}(1:end-1),'.','color',lineStyleOrder{k},'markersize',15);
                 end
@@ -1239,11 +1250,13 @@ else % all in one plot:
     % label y and x axis
     ylabel(SYLabel, 'FontSize', AxisFontSize);
     xlabel(SXLabel, 'FontSize', AxisFontSize);
-%         scale axis
+    
+    % Scale axis
     if logFlag
         set(gca,'xscale','log');
     end
-%   Add legend
+    
+    % Add legend
     if legendExists
         legend(makeTitle(cellLegend),'location',legendLocation);%,'location','SouthOutside');
         legend boxoff;
