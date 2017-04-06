@@ -61,6 +61,7 @@
 %                        rather than the totaly number of points or the
 %                        probability distribution. Useful for data sets
 %                        with small sample sizes. 'p'
+%             'outline': black outline of PDF
 %                 'pdf': Plot the pdf on the y axis
 %             'numbers': Plot the raw numbers on the graph. 'number'
 %              'smooth': Plot a smooth line instead of the step function.
@@ -132,7 +133,7 @@
 %            'separate': Plot each histogram separately, also use normal
 %                        bar plots for the histograms rather than the
 %                        stairs function. Data will not be normalized.
-%                        'separateplots','plotseparately','normalhist','normal','s'
+%                        'separateplots','plotseparately','separatePlots','normal','s'
 %              'newfig': Will make a new figure to plot it in. When using
 %                        'separateplots' 'newfig' will automatically
 %                        change the size of the figure.
@@ -237,11 +238,9 @@ npointsFlag=0;
 legendLocation='best';
 forceNoLegend=0;
 lineColor = [.49 .49 .49];
-% lineColor = [0 0 0];
 faceColor = [.7 .7 .7];
-vertLinesForcedFlag=0;
 multicolorFlag=0;
-brightnessExponent=1/2;
+% brightnessExponent = 0.67;
 plotStdFlag = 1; % 1 if either serror or std will be plotted
 serrorFlag = 0;
 medianFlag = 0;
@@ -252,141 +251,137 @@ decimalPlaces=2;
 legendExists=0;
 linewidth=2;
 newfigFlag=0;
-
+outlineFlag = 0;
 barFactor=1;
-normalHist=0;
+separatePlots=0;
 logFlag = 0;
 logFunc = @(x) x;
+
 
 %% Interpret the user parameters
 k = 1;
 while k <= length(varargin)
     if ischar(varargin{k})
-    switch (lower(varargin{k}))
-        case {'legend','titles','title'}
-            cellLegend=varargin{k+1};
-            legendExists=1;
-            k = k + 1;
-        case {'location','legendlocation'}
-            legendLocation=varargin{k+1};
-            k = k + 1;
-        case 'nolegend'
-            forceNoLegend=1;            
-        case 'xlabel'
-            SXLabel = varargin{k + 1};
-            k = k + 1;
-        case 'ylabel'
-            SYLabel = varargin{k + 1};
-            yLabelFlag=1;
-            k = k + 1;
-        case {'minx','xmin'}
-            minX = varargin{k + 1};
-            k = k + 1;
-        case {'maxx','xmax'}
-            maxX = varargin{k + 1};
-            k = k + 1;
-        case {'minbins','minimumbins'}
-            minBins = varargin{k + 1};
-            k = k + 1;
-        case {'maxbins','maximumbins'}
-            maxBins = varargin{k + 1};
-            k = k + 1;
-        case 'stdtimes' % the number of times the standard deviation to set the upper end of the axis to be.
-            stdTimes = varargin{k + 1};
-            k = k + 1;
-            if ischar(stdTimes)
-                fprintf(['\nstdTimes set to: ' stdTimes]);
-                error('stdTimes must be a number')
-            end
-        case {'binfactor','binfactors','factor','f'}
-            binFactor = varargin{k + 1};
-            k = k + 1;
-            if ischar(binFactor)
-                error('binFactor must be a number')
-            end
-        case {'Linestyle','linestyle'}
-            use_custom_linestyle = true;
-            linestylevals = varargin{k+1};
-            k = k + 1;
-        case {'samebins','samebin','same'}
-            sameBinsFlag=1;
-        case {'proportion','p','fraction','frac','percent','normal'}
-            proportionFlag=1;
-        case 'pdf'
-            pdfFlag=1;
-        case {'numbers','number'}
-            numberFlag = 1;
-        case {'smooth','smoooth','filter','filt'}
-            smoothFlag = 1;
-        case {'log'}
-            logFlag = 1;
-            logFunc = @(x) 10.^x;
-
-            
-        case {'int','integer','discrete','intbins','intbin'}
-            intbinsForcedFlag = 1;
-            intbinsFlag=1;
-            
-            if k+1<= length(varargin)
-                temp = varargin{k + 1};
-                if ~ischar(temp) % if its a number then we want to use it.
-                    intbinsFlag=temp;
-                    k = k + 1;
+        switch (lower(varargin{k}))
+            case {'legend','titles','title'}
+                cellLegend=varargin{k+1};
+                legendExists=1;
+                k = k + 1;
+            case {'location','legendlocation'}
+                legendLocation=varargin{k+1};
+                k = k + 1;
+            case 'nolegend'
+                forceNoLegend=1;            
+            case 'xlabel'
+                SXLabel = varargin{k + 1};
+                k = k + 1;
+            case 'ylabel'
+                SYLabel = varargin{k + 1};
+                yLabelFlag=1;
+                k = k + 1;
+            case {'minx','xmin'}
+                minX = varargin{k + 1};
+                k = k + 1;
+            case {'maxx','xmax'}
+                maxX = varargin{k + 1};
+                k = k + 1;
+            case {'minbins','minimumbins'}
+                minBins = varargin{k + 1};
+                k = k + 1;
+            case {'maxbins','maximumbins'}
+                maxBins = varargin{k + 1};
+                k = k + 1;
+            case 'stdtimes' % the number of times the standard deviation to set the upper end of the axis to be.
+                stdTimes = varargin{k + 1};
+                k = k + 1;
+                if ischar(stdTimes)
+                    fprintf(['\nstdTimes set to: ' stdTimes]);
+                    error('stdTimes must be a number')
                 end
-            end
-            
-        case 'eps'
-            EPSFileName = varargin{k + 1};
-            k = k + 1;
-        case {'fsize','fontsize'}
-            AxisFontSize = varargin{k + 1};
-            k = k + 1;
-        case 'linewidth'
-            linewidth = varargin{k + 1};
-            k = k + 1;
-        case {'color','colors'}
-            lineColor=varargin{k+1};
-            if ischar(lineColor)
-                multicolorFlag = 1;
-            else %then lineColor will be redone later
-                faceColor = lineColor;
-            end
-            k = k + 1;
-        case {'npoints','points'}
-            npointsFlag=1;
-        case {'lines','line'}
-            vertLinesFlag=1;
-            vertLinesForcedFlag=vertLinesForcedFlag+1;
-        case {'noline','nolines'}
-            vertLinesFlag=0;
-            vertLinesForcedFlag=vertLinesForcedFlag+1;
-        case { 'decimalplaces','decimal','precision','textprecision'}
-            decimalPlaces=varargin{k+1};
-            k=k+1;
-        case {'newfig','newfigure'}
-            newfigFlag=true;
-        case {'noerror','noerrors'}
-            plotStdFlag = 0;
-        case {'serror','serrors','stderror','stderrors','sem'}
-            serrorFlag = 1;
-        case {'boxplot','bplot','box'} % surprise! undocumented feature.
-            boxplotFlag = 1;
-            plotStdFlag = 0;
-        case {'barwidth','barfactor','errorbarwidth'}
-            barFactor = varargin{k+1};
-            k = k+1;
-        case {'median','medians'}
-            medianFlag=1;
-        case {'separateplots','separate','plotseparately','normalhist','s'}
-            normalHist=1;
-        case {'mode','modes'}
-            modeFlag = 1;
-        case {'text','alltext','t'}
-            textFlag=1;
-        otherwise
-            warning('user entered parameter is not recognized')
-            disp('unrecognized term is:'); disp(varargin{k});
-    end
+            case {'binfactor','binfactors','factor','f'}
+                binFactor = varargin{k + 1};
+                k = k + 1;
+                if ischar(binFactor)
+                    error('binFactor must be a number')
+                end
+            case {'Linestyle','linestyle'}
+                use_custom_linestyle = true;
+                linestylevals = varargin{k+1};
+                k = k + 1;
+            case {'samebins','samebin','same'}
+                sameBinsFlag=1;
+            case {'proportion','p','fraction','frac','percent','normal'}
+                proportionFlag=1;
+            case 'pdf'
+                pdfFlag=1;
+            case 'outline'
+                outlineFlag = 1;
+            case {'numbers','number'}
+                numberFlag = 1;
+            case {'smooth','smoooth','filter','filt'}
+                smoothFlag = 1;
+            case {'log'}
+                logFlag = 1;
+                logFunc = @(x) 10.^x;
+
+            case {'int','integer','discrete','intbins','intbin'}
+                intbinsForcedFlag = 1;
+                intbinsFlag=1;
+
+                if k+1<= length(varargin)
+                    temp = varargin{k + 1};
+                    if ~ischar(temp) % if its a number then we want to use it.
+                        intbinsFlag=temp;
+                        k = k + 1;
+                    end
+                end
+
+            case 'eps'
+                EPSFileName = varargin{k + 1};
+                k = k + 1;
+            case {'fsize','fontsize'}
+                AxisFontSize = varargin{k + 1};
+                k = k + 1;
+            case 'linewidth'
+                linewidth = varargin{k + 1};
+                k = k + 1;
+            case {'color','colors'}
+                lineColor=varargin{k+1};
+                if length(lineColor) > 1
+                    multicolorFlag = 1;
+                else
+                    faceColor = lineColor;
+                end
+                k = k + 1;
+            case {'npoints','points'}
+                npointsFlag=1;
+            case { 'decimalplaces','decimal','precision','textprecision'}
+                decimalPlaces=varargin{k+1};
+                k=k+1;
+            case {'newfig','newfigure'}
+                newfigFlag=true;
+            case {'noerror','noerrors'}
+                plotStdFlag = 0;
+            case {'serror','serrors','stderror','stderrors','sem'}
+                serrorFlag = 1;
+            case {'boxplot','bplot','box'} % surprise! undocumented feature.
+                boxplotFlag = 1;
+                plotStdFlag = 0;
+            case {'barwidth','barfactor','errorbarwidth'}
+                barFactor = varargin{k+1};
+                k = k+1;
+            case {'median','medians'}
+                medianFlag=1;
+            case {'separateplots','separate'}
+                separatePlots=1;
+            case {'mode','modes'}
+                modeFlag = 1;
+            case {'text','alltext','t'}
+                textFlag=1;
+            otherwise
+                warning('user entered parameter is not recognized')
+                disp('unrecognized term is:'); disp(varargin{k});
+        end
     end
     k = k + 1;
 end
@@ -402,7 +397,7 @@ valueType = valueInfo.class;
 
 switch valueType
     case 'cell' %   There are a few cells there, it will run as usual.
-%         normalHist=what you set it to, or zero;
+%         separatePlots=what you set it to, or zero;
     case 'struct'
         structFlag=1;
         tempValues=cellValues; clear('cellValues');
@@ -427,7 +422,7 @@ switch valueType
     otherwise % Its an array and data needs to be changed to a cell array, for what follows.
         arrayFlag=1;
         cellValues={cellValues};
-        normalHist=1;
+        separatePlots=1;
         
         if legendExists % it is probably passed as a string not a cell
             valueInfo=whos('cellLegend');
@@ -447,12 +442,6 @@ if round(decimalPlaces)~=decimalPlaces
              'the rounded number ' num2str(round(decimalPlaces)) ' will be used instead']);
     decimalPlaces=round(decimalPlaces);
 end
-
-if vertLinesForcedFlag>1
-    warning(['you cannot specify having and not having vertical lines. ' ...
-             'Therefore we will determine it automatically as usual']);
-    vertLinesForcedFlag=0;
-end         
 
 
 
@@ -754,24 +743,7 @@ for k=1:num2Plot
     
     nBins(k)=totalRange/binWidth(k);
 
-%   if there is enough space to plot them, then plot vertical lines.
-% 30 bins is arbitrarily chosen to be the number after which there are
-% vertical lines plotted by default
-    if nBins(k)<30
-        vertLinesArray(k)=1;
-    else
-        vertLinesArray(k)=0;
-    end
 end
-
-% fix the automatic decision if vertical lines were specified by the user
-if vertLinesForcedFlag
-    vertLinesArray=vertLinesArray*0+vertLinesFlag;
-end
-
-% only plot lines if they all can be plotted.
-% also creates one flag, so the 'array' does not need to be used.
-vertLinesFlag=prod(vertLinesArray); % since they are zeros and 1's, this is an "and" statement
 
 % find the maximum bin width
 bigBinWidth=max(binWidth);
@@ -820,7 +792,7 @@ for k=1:num2Plot
 %  Calculate the histograms
      n{k} = histc(Values, binsForHist{k});
      if ~isData(k) % so that the ylim property is not destroyed with maxN being extra large
-         if normalHist
+         if separatePlots
              n{k}=n{k}*0+1; % it will plot it from 0 to one,
          else % it needs to be the lowest minimum possible!
              n{k}=n{k}*0+eps;
@@ -861,11 +833,11 @@ rawN=n; % save the rawN before normalization
 for k=1:num2Plot
 % Normalize, normalize all the data by area
 % only do this if they will be plotted together, otherwise leave it be.
-  if (~normalHist && ~proportionFlag && ~numberFlag) || pdfFlag
+  if (~separatePlots && ~proportionFlag && ~numberFlag) || pdfFlag
 %     n   = (each value)/(width of a bin * total number of points)
 %     n   =  n /(Total area under histogram);
       n{k}=n{k}/(binWidth(k)*numPoints{k});
-  end % if it is a normalHist - then it will be numbers automatically.
+  end % if it is a separatePlots - then it will be numbers automatically.
 
   if proportionFlag
 %     n   =  n /(Total number of points);
@@ -891,7 +863,7 @@ if newfigFlag % determine figure height
     elseif num2Plot>2
         figHeight=sizes(num2Plot-2);
     end
-    if normalHist && num2Plot>2
+    if separatePlots && num2Plot>2
 %         figure('Name', Title,'Position',[4     300     335    figHeight%         ]);
         figure('Position',[4    4     435    figHeight   ]);
     else % no reason to stretch it out so much, use default size
@@ -904,7 +876,7 @@ else % all we need to do is make sure that the old figures holdstate is okay.
     %save the initial hold state of the figure.
     hold_state = ishold;
     if ~hold_state
-        if normalHist && num2Plot>1
+        if separatePlots && num2Plot>1
 %           you need to clear the whole figure to use sub-plot
             clf;
         else
@@ -918,28 +890,31 @@ end
 
 hold on;
 %% PREPARE THE COLORS
-if normalHist %
+% if separatePlots %
    if multicolorFlag
-%         lineStyleOrder=linspecer(num2Plot,'jet');
-        faceStyleOrder=linspecer(num2Plot,lineColor);
-        for k=1:num2Plot % make the face colors brighter a bit
-            lineStyleOrder{k}=[0 0 0];
-            faceStyleOrder{k}=(faceStyleOrder{k}).^(brightnessExponent); % this will make it brighter than the line           
-        end
+        lineStyleOrder = lineColor;
+        faceStyleOrder = lineColor;
+        
+%         % Loop through each data group
+%         for k=1:num2Plot
+%             % Make the face colors brighter a bit
+%             faceStyleOrder{k}=(lineColor{k}).^(brightnessExponent);
+%         end
+        
    else % then we need to make all the graphs the same color, gray or not
         for k=1:num2Plot
             lineStyleOrder{k}=[0 0 0];
             faceStyleOrder=faceColor;
         end
    end
-else % they will all be in one plot, its simple. there is no faceStyleOrder
-    % If user inputs lineColor, it will be a cell (or array of cells)
-    if iscell(lineColor)
-        lineStyleOrder = lineColor;
-    else % just use the default 'jet' colormap.
-        lineStyleOrder=linspecer(num2Plot,'qualitative');
-    end    
-end
+% else % they will all be in one plot, its simple. there is no faceStyleOrder
+%     % If user inputs lineColor, it will be a cell (or array of cells)
+%     if iscell(lineColor)
+%         lineStyleOrder = lineColor;
+%     else % just use the default 'jet' colormap.
+%         lineStyleOrder=linspecer(num2Plot,'qualitative');
+%     end    
+% end
 
 %% PLOT THE HISTOGRAM
 % reason for this loop:
@@ -947,8 +922,8 @@ end
 % colors, this just seems like an easy way to make sure that is all plotted
 % in the right order - not the most effient but its fast enough as it is.
 % it is plotted below the x axis so it will never appear
-if normalHist % There will be no legend for the normalHist, therefore this loop is not needed.
-% But we might as well run it to set the fontsize here:
+
+if separatePlots % There will be no legend for the separatePlots, therefore this loop is not needed.
     for k=1:num2Plot
         if num2Plot>1
             subplot(num2Plot,1,k);
@@ -967,97 +942,86 @@ else % do the same thing, but on different subplots
     end
     set(gca,'fontsize',AxisFontSize);
 end
-if normalHist % plot on separate sub-plots
+
+if separatePlots
     for k=1:num2Plot
-        if num2Plot>1
+        
+        if num2Plot > 1
             subplot(num2Plot,1,k);
         end
         hold on;
-        if isData(k)
-%           Note this is basically doing what the 'histc' version of bar does,
-%           but with more functionality (there must be some matlab bug which
-%           doesn't allow changing the lineColor property of a histc bar graph.)
-            if vertLinesFlag % then plot the bars with edges
-                bar(logFunc(x{k}+binWidth(k)/2),n{k}/1,'FaceColor',faceStyleOrder{k},'barwidth',1,'EdgeColor','k','linewidth',1.5)
-            else % plot the bars without edges
-                bar(logFunc(x{k}+binWidth(k)/2),n{k}/1,'FaceColor',faceStyleOrder{k},'barwidth',1,'EdgeColor','none')
-            end
-            
-            if ~smoothFlag
-                stairs(logFunc(x{k}),n{k},'k','linewidth',linewidth);
-                plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color','k','linewidth',linewidth);
-            else % plot it smooth, skip the very edges.
-%                 plot(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),'k','linewidth',linewidth);
-%                 xi = linspace(SXRange(1),SXRange(2),500); yi = pchip(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),xi);
-                xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
-%                 not to (end-1) like above, so we got an extra digit
-                yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
-                plot(logFunc(xi),yi,'k','linewidth',linewidth);
-            end
-            
-            
+
+        % Plot the bars without edges
+        bar(logFunc(x{k}+binWidth(k)/2),n{k}/1,'FaceColor',faceStyleOrder{k},'barwidth',1,'EdgeColor','none')
+
+        if outlineFlag
+            stairs(logFunc(x{k}),n{k},'k','linewidth',linewidth);
+            plot(x{k}(1:end-1)+binWidth(k)/2,n{k}(1:end-1),'k','linewidth',linewidth);
+            xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
+            yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
+            plot(logFunc(xi),yi,'k','linewidth',linewidth);
         end
     end
-else % plot them all on one graph with the stairs function
-    for k=1:num2Plot
-        if isData(k)
-            if ~smoothFlag
-                stairs(logFunc(x{k}),n{k},'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
-                plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
-            else % plot it smooth
-                
-                % not to (end-1) like above, so we got an extra digit
-                xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
-                yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
-                
-                plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
-                
-                if vertLinesFlag % ???
-                    plot(logFunc(x{k}(1:end-1)+binWidth(k)/2),n{k}(1:end-1),'.','color',lineStyleOrder{k},'markersize',15);
-                end
-            end
-        end
-    end
-end
-%% PLOT THE STARS IF CROPPED
-% plot a star on the last bin in case the ends are cropped
-% This also adds the following text in the caption:
-% 'The starred column on the far right represents the bin for all values
-% that lie off the edge of the graph.'
-%     Note that the star is placed +maxN/20 above the column, this
-%     is so that its the same for all data, and relative to the y
-%     axis range, not the individual plots. The text starts at the
-%     top, so it only needs a very small push to get above it.
-if normalHist
-    for k=1:num2Plot
-        if num2Plot>1
-            subplot(num2Plot,1,k);
-        end
-        if isData(k)
-        if cropped_right{k} % if some of the data points lie outside the bins.
-            text(logFunc(x{k}(end-1)+binWidth(k)/10),n{k}(end-1)+max(n{k})/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
-        end
-        if cropped_left{k} % if some of the data points lie outside the bins.
-            text(logFunc(x{k}(1)+binWidth(k)/10),n{k}(1)+max(n{k})/30-max(n{k})/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
-        end
-        end
-    end
+
+% Plot them all on one graph with the stairs function    
 else
     for k=1:num2Plot
-        if isData(k)
-%             stairs(x{k},n{k},'color',lineStyleOrder{k},'linewidth',linewidth);
-%             plot([x{k}(1) x{k}(1)],[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth);
-
-      %    ADD A STAR IF CROPPED 
-            if cropped_right{k} % if some of the data points lie outside the bins.
-                text(logFunc(x{k}(end-1)+binWidth(k)/10),n{k}(end-1)+maxN/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
-            end
-            if cropped_left{k} % if some of the data points lie outside the bins.
-                text(logFunc(x{k}(1)+binWidth(k)/10),n{k}(1)+maxN/30-maxN/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
-            end
+        % Plot the bars without edges
+        bar(logFunc(x{k}+binWidth(k)/2), n{k}/1, ...
+            'FaceColor', faceStyleOrder{k}, ...
+            'barwidth', 1, 'EdgeColor','none', ...
+             'FaceAlpha', 0.5);
+        
+        if smoothFlag
+            xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
+            yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
+            plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
+        else
+            stairs(logFunc(x{k}),n{k},'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
+            plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
         end
     end
 end
+
+% %% PLOT THE STARS IF CROPPED
+% % plot a star on the last bin in case the ends are cropped
+% % This also adds the following text in the caption:
+% % 'The starred column on the far right represents the bin for all values
+% % that lie off the edge of the graph.'
+% %     Note that the star is placed +maxN/20 above the column, this
+% %     is so that its the same for all data, and relative to the y
+% %     axis range, not the individual plots. The text starts at the
+% %     top, so it only needs a very small push to get above it.
+% if separatePlots
+%     for k=1:num2Plot
+%         if num2Plot>1
+%             subplot(num2Plot,1,k);
+%         end
+%         if isData(k)
+%         if cropped_right{k} % if some of the data points lie outside the bins.
+%             text(logFunc(x{k}(end-1)+binWidth(k)/10),n{k}(end-1)+max(n{k})/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
+%         end
+%         if cropped_left{k} % if some of the data points lie outside the bins.
+%             text(logFunc(x{k}(1)+binWidth(k)/10),n{k}(1)+max(n{k})/30-max(n{k})/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
+%         end
+%         end
+%     end
+% else
+%     for k=1:num2Plot
+%         if isData(k)
+% %             stairs(x{k},n{k},'color',lineStyleOrder{k},'linewidth',linewidth);
+% %             plot([x{k}(1) x{k}(1)],[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth);
+% 
+%       %    ADD A STAR IF CROPPED 
+%             if cropped_right{k} % if some of the data points lie outside the bins.
+%                 text(logFunc(x{k}(end-1)+binWidth(k)/10),n{k}(end-1)+maxN/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
+%             end
+%             if cropped_left{k} % if some of the data points lie outside the bins.
+%                 text(logFunc(x{k}(1)+binWidth(k)/10),n{k}(1)+maxN/30-maxN/50,'*','fontsize',AxisFontSize,'color',lineStyleOrder{k});
+%             end
+%         end
+%     end
+% end
 
 %% PLOT the ERROR BARS and MODE
 % but only if it was requested
@@ -1070,7 +1034,7 @@ end
 
 for k=1:num2Plot
     if isData(k)
-        if normalHist % separate plots with separate y-axis                
+        if separatePlots % separate plots with separate y-axis                
             if num2Plot>1
                 subplot(num2Plot,1,k);
             end
@@ -1085,7 +1049,7 @@ for k=1:num2Plot
             end
         end
         if medianFlag
-            if normalHist % plot with 'MarkerFaceColor'
+            if separatePlots % plot with 'MarkerFaceColor'
                 stem(logFunc(medianV{k}),(1.1)*tempMax,'color',lineStyleOrder{k},'linewidth',linewidth,'MarkerFaceColor',faceStyleOrder{k});
             else % plot hollow
                 stem(logFunc(medianV{k}),(1.1)*tempMax,'color',lineStyleOrder{k},'linewidth',linewidth)
@@ -1096,14 +1060,14 @@ for k=1:num2Plot
         if modeFlag % then plot the median in the center as a stem plot
     %               Note that this mode is rounded . . .
             if medianFlag % plot the mode in a different way
-                if normalHist
+                if separatePlots
                     stem(logFunc(roundedMode{k}),(1.1)*tempMax,'--','color',lineStyleOrder{k},'linewidth',linewidth,'MarkerFaceColor',faceStyleOrder{k});
                 else
                     stem(logFunc(roundedMode{k}),(1.1)*tempMax,'--','color',lineStyleOrder{k},'linewidth',linewidth)
                 end
 
             else % plot the regular way and there will be no confusion
-                if normalHist
+                if separatePlots
                     stem(logFunc(roundedMode{k}),(1.1)*tempMax,'color',lineStyleOrder{k},'linewidth',linewidth,'MarkerFaceColor',faceStyleOrder{k})
                 else
                     stem(logFunc(roundedMode{k}),(1.1)*tempMax,'color',lineStyleOrder{k},'linewidth',linewidth);
@@ -1125,7 +1089,7 @@ for k=1:num2Plot
         end
 
         if plotStdFlag % it is important to set the ylim property here so errorb plots the appropriate sized error bars
-            if normalHist
+            if separatePlots
                 ylim([0 max(n{k})*(1.1+.1)+modeShift{k}]);% add this in case the data is zero
                 tempY=tempMax.*1.1+modeShift{k};
             else
@@ -1139,18 +1103,24 @@ for k=1:num2Plot
                 errorb(meanV{k},tempY,stdV{k},                   'horizontal','color',lineStyleOrder{k},'barwidth',barFactor,'linewidth',linewidth);
             end
 
-            if normalHist % plot only the dot in color
-                plot(logFunc(meanV{k}),tempY,'.','markersize',25,'color',faceStyleOrder{k});
-                plot(logFunc(meanV{k}),tempY,'o','markersize',8,'color',[0 0 0],'linewidth',linewidth);
-            else % plot everything in color, this dot and the bars before it
-                plot(logFunc(meanV{k}),tempY,'.','markersize',25,'color',lineStyleOrder{k});
-            end
+            
+            plot(logFunc(meanV{k}),tempY,'.','markersize',25,'color',lineStyleOrder{k});
+            
+%             if separatePlots
+%                 % Plot the middle of data as a dot OVER the error bar
+%                 plot(logFunc(meanV{k}),tempY,'.','markersize',25,'color',faceStyleOrder{k});
+%                 
+%                 % Highligh the middle of data with a black dot
+%                 % plot(logFunc(meanV{k}),tempY,'o','markersize',8,'color',[0 0 0],'linewidth',linewidth);
+%             else % plot everything in color, this dot and the bars before it
+%                 plot(logFunc(meanV{k}),tempY,'.','markersize',25,'color',lineStyleOrder{k});
+%             end
         end
 
         % Plot the boxplot!
         if boxplotFlag % it is important to set the ylim property here so errorb plots the appropriate sized error bars
 
-            if normalHist
+            if separatePlots
                 ylim([0 max(n{k})*(1.3+.3)+modeShift{k}]);% add this in case the data is zero
                 tempY=tempMax.*1.3+modeShift{k}; % note: 1.3 instead of 1.2 because the boxplot needs a little more room.
             else
@@ -1158,7 +1128,7 @@ for k=1:num2Plot
                 tempY=tempMax*(1+.3*(num2Plot-k+1))+modeShift{k};
             end
 
-            if normalHist
+            if separatePlots
                 boxplotWidth = max(n{k})*.18; % the highest of & any of the datasets.
             else % do them separately, to each their own width
                 boxplotWidth = max([n{:}])*.18; % the highest of & any of the datasets.
@@ -1170,7 +1140,7 @@ for k=1:num2Plot
                 pointsOrNo = 'nopoints';
             end
 
-            if normalHist % plot the thing with all the colors, there is just one of them.
+            if separatePlots % plot the thing with all the colors, there is just one of them.
                 bplot(logFunc(cellValues{k}),tempY,'barwidth',boxplotWidth,'linewidth',linewidth,'horizontal',pointsOrNo,'specialwidth','histmode');
             else % plot with the color for that data set
                 bplot(logFunc(cellValues{k}),tempY,'color',lineStyleOrder{k},'barwidth',boxplotWidth,'linewidth',linewidth,'horizontal',pointsOrNo,'specialwidth','histmode');
@@ -1201,7 +1171,7 @@ else
     elseif numberFlag
         SYLabel = 'number';
     else
-        if normalHist % then they are not normalized
+        if separatePlots % then they are not normalized
             SYLabel = 'number';
         else
             SYLabel = 'pdf'; % probability density function
@@ -1209,7 +1179,7 @@ else
     end
 end
 
-if normalHist
+if separatePlots
     for k=1:num2Plot        
         if num2Plot>1
             subplot(num2Plot,1,k);
