@@ -13,15 +13,15 @@ google_colors.red = hex2rgb('F44336');
 
 google_colors.blue = hex2rgb('2196F3');
 
-google_colors.gray = hex2rgb('9E9E9E');
+google_colors.green = hex2rgb('4CAF50');
 
 google_colors.purple = hex2rgb('9C27B0');
 
-google_colors.green = hex2rgb('4CAF50');
+google_colors.orange = hex2rgb('FF9800');
+
+google_colors.gray = hex2rgb('9E9E9E');
 
 google_colors.yellow = hex2rgb('FFEB3B');
-
-google_colors.orange = hex2rgb('FF9800');
 
 google_colors.brown = hex2rgb('795548');
 
