@@ -9,9 +9,9 @@ function google_colors = load_google_colors()
 %
 % By Erik Reinertsen <er@gatech.edu>
 
-google_colors.blue = hex2rgb('2196F3');
-
 google_colors.red = hex2rgb('F44336');
+
+google_colors.blue = hex2rgb('2196F3');
 
 google_colors.gray = hex2rgb('9E9E9E');
 
