@@ -1148,8 +1148,8 @@ for k=1:num2Plot
         end
     
         % Set axes ticks to have two decimal places
-        set(gca,'xticklabel',num2str(get(gca,'xtick')','%1.2f'));
-        set(gca,'yticklabel',num2str(get(gca,'ytick')','%1.2f'));
+%         set(gca,'xticklabel',num2str(get(gca,'xtick')','%1.2f'));
+%         set(gca,'yticklabel',num2str(get(gca,'ytick')','%1.2f'));
     
     end % if isData
 end % num2plot loop over
