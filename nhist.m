@@ -904,7 +904,7 @@ hold on;
    else % then we need to make all the graphs the same color, gray or not
         for k=1:num2Plot
             lineStyleOrder{k}=[0 0 0];
-            faceStyleOrder=faceColor;
+            faceStyleOrder{1}=faceColor;
         end
    end
 % else % they will all be in one plot, its simple. there is no faceStyleOrder
@@ -966,17 +966,18 @@ if separatePlots
 % Plot them all on one graph with the stairs function    
 else
     for k=1:num2Plot
-        % Plot the bars without edges
-        bar(logFunc(x{k}+binWidth(k)/2), n{k}/1, ...
-            'FaceColor', faceStyleOrder{k}, ...
-            'barwidth', 1, 'EdgeColor','none', ...
-             'FaceAlpha', 0.5);
         
         if smoothFlag
             xi = linspace(SXRange(1)-binWidth(k)/2,SXRange(2)+binWidth(k)/2,500);
             yi = pchip([x{k}(1)-binWidth(k)/2, x{k}(1:end)+binWidth(k)/2],[0 n{k}(1:end-1) 0],xi);
             plot(logFunc(xi),yi,'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
         else
+            % Plot the bars without edges
+            bar(logFunc(x{k}+binWidth(k)/2), n{k}/1, ...
+            'FaceColor', faceStyleOrder{k}, ...
+            'barwidth', 1, 'EdgeColor','none', ...
+             'FaceAlpha', 0.5);
+         
             stairs(logFunc(x{k}),n{k},'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
             plot(logFunc([x{k}(1) x{k}(1)]),[0 n{k}(1)],'color',lineStyleOrder{k},'linewidth',linewidth,'Linestyle',linestylevals{k});
         end
