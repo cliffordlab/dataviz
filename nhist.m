@@ -346,8 +346,8 @@ while k <= length(varargin)
                 linewidth = varargin{k + 1};
                 k = k + 1;
             case {'color','colors'}
-                lineColor=varargin{k+1};
-                if length(lineColor) > 1
+                lineColor = varargin{k+1};
+                if size(lineColor, 1) > 1
                     multicolorFlag = 1;
                 else
                     faceColor = lineColor;
@@ -890,8 +890,7 @@ end
 
 hold on;
 %% PREPARE THE COLORS
-% if separatePlots %
-   if multicolorFlag
+    if multicolorFlag
         lineStyleOrder = lineColor;
         faceStyleOrder = lineColor;
         
@@ -904,7 +903,7 @@ hold on;
    else % then we need to make all the graphs the same color, gray or not
         for k=1:num2Plot
             lineStyleOrder{k}=[0 0 0];
-            faceStyleOrder{1}=faceColor;
+            faceStyleOrder{1} = faceColor;
         end
    end
 % else % they will all be in one plot, its simple. there is no faceStyleOrder
