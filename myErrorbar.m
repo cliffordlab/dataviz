@@ -32,7 +32,7 @@ function hh = myErrorbar(varargin)
 %
 %   Based on the matlab-function errorbar as revised by Claude Berney
 %   c: jonas, 06-03
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %==================
 % check input
