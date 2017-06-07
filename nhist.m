@@ -396,6 +396,8 @@ valueInfo = whos('cellValues');
 valueType = valueInfo.class;
 
 switch valueType
+    case 'double'
+        cellValues = {cellValues};
     case 'cell' %   There are a few cells there, it will run as usual.
 %         separatePlots=what you set it to, or zero;
     case 'struct'
@@ -528,7 +530,12 @@ for k=1:num2Plot
     if nnan>0
         cellValues{k}=cellValues{k}(~nanValues);
         
-        if nnan>1, waswere='were'; else waswere='was'; end
+        if nnan > 1
+            waswere = 'were';
+        else
+            waswere = 'was';
+        end
+        
         warning(['data set #:' num2str(k) ' has ' num2str(nnan) ' ''NaN'' values which ' waswere ' removed from all analysis and counts\n']);
     end
 
@@ -890,22 +897,25 @@ end
 
 hold on;
 %% PREPARE THE COLORS
-    if multicolorFlag
-        lineStyleOrder = lineColor;
-        faceStyleOrder = lineColor;
-        
-%         % Loop through each data group
-%         for k=1:num2Plot
-%             % Make the face colors brighter a bit
-%             faceStyleOrder{k}=(lineColor{k}).^(brightnessExponent);
-%         end
-        
-   else % then we need to make all the graphs the same color, gray or not
-        for k=1:num2Plot
-            lineStyleOrder{k}=[0 0 0];
-            faceStyleOrder{1} = faceColor;
-        end
-   end
+if multicolorFlag
+    
+    lineStyleOrder = lineColor;
+    faceStyleOrder = lineColor;
+    
+    % Loop through each data group and brighten the face colors
+    for k=1:num2Plot
+        faceStyleOrder{k} = (lineColor{k}).^(brightnessExponent);
+    end
+
+else % Default to cycle through the Google Colors
+    for k=1:num2Plot
+        lineStyleOrder{k}=[0 0 0];
+        googleColors = loadGoogleColors();
+        googleColorNames = fieldnames(googleColors); 
+        faceStyleOrder{k} = googleColors.(googleColorNames{k});
+    end
+end
+
 % else % they will all be in one plot, its simple. there is no faceStyleOrder
 %     % If user inputs lineColor, it will be a cell (or array of cells)
 %     if iscell(lineColor)
