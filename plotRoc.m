@@ -9,7 +9,7 @@ linestyles = generateLinestyles(8);
 
 for i = 1:numel(rocData)
     plot(rocData(i).xTest, rocData(i).yTest, ...
-         linestyles{i}, 'linewidth', 2);
+         linestyles{i}, 'linewidth', 1);
  
 % plot(optrocptTrain(1), optrocptTrain(2), 'o', 'MarkerEdgeColor', ...
 %     inputColors{1}, 'LineWidth', 4, 'MarkerSize', 13);
