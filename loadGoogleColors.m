@@ -16,6 +16,7 @@ googleColors.orange = hex2rgb('FF9800');
 googleColors.gray = hex2rgb('9E9E9E');
 googleColors.grey = hex2rgb('9E9E9E');
 googleColors.yellow = hex2rgb('FFEB3B');
+googleColors.amber = hex2rgb('FFC107');
 googleColors.brown = hex2rgb('795548');
 
 end
