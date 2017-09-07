@@ -1,11 +1,11 @@
 function plotRoc(rocData, legendStr)
 
 % Initialize figure
-figure('Position', [100 100 800 600]);
+% figure('Position', [100 100 800 600]);
 hold on;
 
 % Create cell array for linestyle
-linestyles = generateLinestyles(8);
+linestyles = generateLinestyles(9);
 
 for i = 1:numel(rocData)
     plot(rocData(i).xTest, rocData(i).yTest, ...
@@ -37,7 +37,7 @@ set(gca,'XTick',x)
 set(gca,'XTickLabel', cellstr(num2str(x(:), '%1.2f')) );
 
 
-legend(legendStr, 'location', 'best');
+legend(legendStr, 'location', 'southeast');
 legend boxoff;
 
 set(gca, 'fontsize', 18);
@@ -45,7 +45,7 @@ set(gca, 'fontsize', 18);
 % Set background to white
 set(gcf, 'color', 'w');
 
-% Expand axes to fill figure
-tightfig;
+% % Expand axes to fill figure
+% tightfig;
 
 end % end function
