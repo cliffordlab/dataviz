@@ -1,4 +1,4 @@
-function varargout=sigstar(groups,stats,nosort)
+function varargout = significance_star(groups,stats,nosort)
 
 % sigstar - Add significance stars to bar charts, boxplots, line charts, etc,
 %
